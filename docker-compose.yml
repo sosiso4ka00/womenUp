@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - './data/:/data/db/'
+    ports:
+      - 27017:27017
+
+  express:
+    image: node
+    depends_on:
+      - mongo
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      PORT: 3000
+      SALT_ROUNDS: 8
+      MONGO_URL: mongodb://root:example@mongo:27017/
+      JWT_SECRET: secret
+    volumes:
+      - "./:/app/data"
+    command: bash -c "npm install && npm run nodemon"
+    working_dir: /app/data
